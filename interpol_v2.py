@@ -13,8 +13,6 @@ r = [a.split('/')[-2] for a in results]
 #csv_input_path='./' + directory + '/*.csv'
 #files = glob.glob(csv_input_path)
 
-currentSave = 0
-
 for p,q in zip(r,results):
 
     #load in .csv files
@@ -63,8 +61,5 @@ for p,q in zip(r,results):
     full_array = np.concatenate((zeros_array, DEM), axis=0)
     
     # save array as a color image
-    scan_name = './interpol2/' + str(currentSave) + '.jpg'
+    scan_name = './interpol2/' + str(p) + '.jpg'
     plt.imsave(scan_name, full_array) 
-
-    # iterating
-    currentSave = currentSave + 1
