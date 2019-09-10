@@ -23,8 +23,8 @@ image_files = glob.glob(image_input_path)
 csv_files = sorted(csv_files)
 image_files = sorted(image_files)
 #flength=len(image_files)+1
-flength = 1488+1
-i=1425
+flength = 1449+1
+i=1437
 
 while i < flength:
 	#move CSVs and Image files to individual folders	
@@ -44,7 +44,16 @@ while i < flength:
 	net = cv2.dnn.readNetFromTensorflow(weightsPath, configPath)
 	
 	#load in image from newly made folder from which masks will be generated 
-	image = cv2.imread('./' + directory + '/' + str(i) + '/' + str(i) + '.jpg')  
+	image = cv2.imread('./' + directory + '/' + str(i) + '/' + str(i) + '.jpg')
+
+	scale_percent = 50 # percent of original size
+	width = int(image.shape[1] * scale_percent / 100)
+	height = int(image.shape[0] * scale_percent / 100)
+	dim = (width, height)
+	
+	# resize image
+	image = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)  
+
 	#find image spatial dimentions 	
 	(H, W) = image.shape[:2]
 	
