@@ -1,9 +1,6 @@
 import glob
 import numpy as np
 
-#directory = './data'
-#dirs = glob.glob(directory + '/*/')
-
 def get_data_mask(dirs):
     dataset = []
     for d in dirs:
@@ -112,4 +109,3 @@ def get_data_dis(dirs):
                 distances = np.array([float(dis) for dis in content])
                 dataset.append([[float(bc) for bc in box_content] + labels[label],float(str(np.min(distances)))])                                               
     return dataset
-#get_data_bbox()
