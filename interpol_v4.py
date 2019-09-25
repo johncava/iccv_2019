@@ -4,15 +4,12 @@ import numpy as np
 import sys
 from scipy.interpolate import griddata
 from PIL import Image
-import matplotlib.pyplot as plt
-import cv2
 
-directory = sys.argv[1]
-results = glob.glob(directory+'/*/')
+results = list(np.load('training.npy')) + list(np.load('test.npy'))
 r = [a.split('/')[-2] for a in results]
 
 for p,q in zip(r,results):
-
+    
     #load in .csv files
 
     file_ = q + p + '.csv'
@@ -25,7 +22,6 @@ for p,q in zip(r,results):
 
     pixel_y = np.genfromtxt(file_, delimiter=',', usecols=2)
 
-    # get the image size (x,y)
     size_x, size_y = Image.open(q + p + '.jpg').size
 
     # crop extra pixels to match camera frame size
@@ -61,6 +57,8 @@ for p,q in zip(r,results):
     # add zero array to top of DEM array
     full_array = np.concatenate((zeros_array, DEM), axis=0)
     
-    # save array as a color image to specified directory
-    scan_name = q + str(p) + '.jpg'
-    plt.imsave(scan_name, full_array) 
+    # save array as a color image
+    scan_name = q + 'interpolation.npy'
+    np.save(scan_name, full_array)
+    
+    end = time.time()
