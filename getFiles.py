@@ -8,22 +8,21 @@ import numpy as np
 ##
 
 short_dirs = glob.glob('./../ICCV_Dataset/*Short/*short/combined/*/')
+mid_dirs = glob.glob('./../ICCV_Dataset/*Mid/*mid/combined/*/')
+far_dirs = glob.glob('./../ICCV_Dataset/*Far/*far/combined/*/')
+dirs = short_dirs + mid_dirs + far_dirs
 
-#mid_dirs = glob.glob('*Mid/*mid/combined/*/')
-#far_dirs = glob.glob('*Far/*far/combined/*/')
-#dirs = short_dirs + mid_dirs + far_dirs
-
-filter_short_dirs = []
-for s in short_dirs:
+filter_dirs = []
+for s in dirs:
     pic = s + s.split('/')[-2] + '.jpg'
     check = glob.glob(s + '*.jpg')
     if len(check) <= 2:
         continue
-    filter_short_dirs.append(s)
+    filter_dirs.append(s)
 
-random.shuffle(filter_short_dirs)
-threshold = int(len(filter_short_dirs)*0.80)
-training, test = filter_short_dirs[:threshold], filter_short_dirs[threshold:]
-print(len(short_dirs),len(filter_short_dirs), len(training), len(test))
+random.shuffle(filter_dirs)
+threshold = int(len(filter_dirs)*0.80)
+training, test = filter_dirs[:threshold], filter_dirs[threshold:]
+print(len(dirs),len(filter_dirs), len(training), len(test))
 np.save('training.npy',training)
 np.save('test.npy',test)
