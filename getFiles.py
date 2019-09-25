@@ -1,4 +1,6 @@
 import glob
+import random
+import numpy as np
 
 ##
 # Get the dataset with folders from ICCV_Dataset and filter
@@ -19,4 +21,9 @@ for s in short_dirs:
         continue
     filter_short_dirs.append(s)
 
-print(len(short_dirs),len(filter_short_dirs))
+random.shuffle(filter_short_dirs)
+threshold = int(len(filter_short_dirs)*0.80)
+training, test = filter_short_dirs[:threshold], filter_short_dirs[threshold:]
+print(len(short_dirs),len(filter_short_dirs), len(training), len(test))
+np.save('training.npy',training)
+np.save('test.npy',test)
