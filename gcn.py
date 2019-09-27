@@ -16,7 +16,7 @@ for i,d in enumerate(directories):
     dataset = dataset + data
     if len(dataset) > 20:
         break
-print(len(dataset))
+#print(dataset)
 '''
 fold = int(sys.argv[1])                                                         
 indices = np.load('./../indices.npy')                                                
@@ -87,6 +87,7 @@ for epoch in range(max_epochs):
     end = time.time()
 
 print(end-start)
+
 '''
 # Testing                                                                       
 total_loss = []
