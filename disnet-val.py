@@ -32,7 +32,7 @@ class Disnet(nn.Module):
     def forward(self,x):
         return self.disnet(x)
 
-model = Disnet()                                                              
+model = Disnet().cuda()                                                              
 learning_rate = 1e-3                                                            
 optimizer = optim.Adam(model.parameters(),lr=learning_rate)                     
 max_epochs = 1                                                                
@@ -49,9 +49,9 @@ for epoch in range(max_epochs):
         for i in data:                                                          
             x.append(i[0])                                                      
             y.append(i[1])                                                      
-        x = Variable(torch.Tensor(x),requires_grad=False).view(len(data),7)     
+        x = Variable(torch.Tensor(x).cuda(),requires_grad=False).view(len(data),7)     
         pred = model(x)                                                         
-        y = Variable(torch.Tensor(y),requires_grad=False).view(len(data),1)     
+        y = Variable(torch.Tensor(y).cuda(),requires_grad=False).view(len(data),1)     
         optimizer.zero_grad()                                                   
         loss = loss_fn(pred,y)
         epoch_loss.append(loss.item())                                                  
@@ -67,9 +67,9 @@ for epoch in range(max_epochs):
         for t in data:
             test_x.append(t[0])
             test_y.append(t[1])
-        test_x = Variable(torch.Tensor(test_x),requires_grad=False).view(len(data),7)
+        test_x = Variable(torch.Tensor(test_x).cuda(),requires_grad=False).view(len(data),7)
         test_pred = model.forward(test_x)
-        test_y = Variable(torch.Tensor(test_y),requires_grad=False).view(len(data),1)
+        test_y = Variable(torch.Tensor(test_y).cuda(),requires_grad=False).view(len(data),1)
         loss = (pred - y) ** 2                                                     
         validation_loss += loss.view(-1).detach().data.numpy().tolist()
 
