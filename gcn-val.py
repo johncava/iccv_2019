@@ -76,11 +76,6 @@ for epoch in range(max_epochs):
         epoch_loss.append(loss.item())
         loss.backward()
         optimizer.step()
-    end = time.time()
-    print('epoch loss: ' + str(sum(epoch_loss)/len(epoch_loss)))
-    torch.save(model.state_dict(), './checkpoints/gcn-3_layer-epoch_'+str(epoch)+'.model')
-
-    print(end-start)
 
     # Validation                                                                       
     validation_loss = []                                                                 
@@ -102,4 +97,7 @@ for epoch in range(max_epochs):
         test_y = Variable(torch.Tensor(test_y).cuda(),requires_grad=False).view(len(data),1)
         loss = (test_pred - test_y) ** 2
         validation_loss += loss.view(-1).detach().data.numpy().tolist()
-    print(np.array(validation_loss).mean()) 
+        
+    end = time.time()
+    torch.save(model.state_dict(), './checkpoints/gcn/gcn-3_layer-epoch_'+str(epoch)+'.model') 
+    print('epoch loss: ' + str(sum(epoch_loss)/len(epoch_loss)) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str(print(end-start))) 

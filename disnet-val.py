@@ -35,39 +35,44 @@ class Disnet(nn.Module):
 model = Disnet()                                                              
 learning_rate = 1e-3                                                            
 optimizer = optim.Adam(model.parameters(),lr=learning_rate)                     
-max_epochs = int(sys.argv[2])                                                                  
+max_epochs = 1                                                                
 loss_fn = nn.MSELoss()                                                          
                                                                                 
 import time                                                                   
-for epoch in range(max_epochs):                                                 
-    for train in train_set:                                                        
-        x,y = [],[]                                                             
-        for i in dataset[train]:                                                          
+for epoch in range(max_epochs):
+    epoch_loss = []
+    start = time.time()                                                
+    for train in Train:                                                        
+        x,y = [],[]
+        dirs = glob.glob(train)
+        data = get_data_bbox(dirs)                                                            
+        for i in data:                                                          
             x.append(i[0])                                                      
             y.append(i[1])                                                      
-        x = Variable(torch.Tensor(x),requires_grad=False).view(len(dataset[train]),7)     
+        x = Variable(torch.Tensor(x),requires_grad=False).view(len(data),7)     
         pred = model(x)                                                         
-        y = Variable(torch.Tensor(y),requires_grad=False).view(len(dataset[train]),1)     
+        y = Variable(torch.Tensor(y),requires_grad=False).view(len(data),1)     
         optimizer.zero_grad()                                                   
-        loss = loss_fn(pred,y)                                                  
+        loss = loss_fn(pred,y)
+        epoch_loss.append(loss.item())                                                  
         loss.backward()                                                         
         optimizer.step()                                                        
-        break
 
-# Testing
-total_loss = []
-total_rel = []
-for test in test_set:
-    test_x,test_y = [],[]
-    for t in dataset[test]:
-        test_x.append(t[0])
-        test_y.append(t[1])
-    test_x = Variable(torch.Tensor(test_x),requires_grad=False).view(len(dataset[test]),7)
-    test_pred = model.forward(test_x)
-    test_y = Variable(torch.Tensor(test_y),requires_grad=False).view(len(dataset[test]),1)
-    loss = (pred - y) ** 2
-    rel_loss = torch.abs(test_pred - test_y)
-    total_rel += rel_loss.view(-1).detach().data.numpy().tolist()                                                      
-    total_loss += loss.view(-1).detach().data.numpy().tolist()
-print(np.array(total_rel).mean())                                                                
-print(np.array(total_loss).mean()) 
+    # Validation
+    validation_loss = []
+    for test in Test:
+        test_x,test_y = [],[]
+        dirs = glob.glob(test)
+        data = get_data_bbox(dirs) 
+        for t in data:
+            test_x.append(t[0])
+            test_y.append(t[1])
+        test_x = Variable(torch.Tensor(test_x),requires_grad=False).view(len(data),7)
+        test_pred = model.forward(test_x)
+        test_y = Variable(torch.Tensor(test_y),requires_grad=False).view(len(data),1)
+        loss = (pred - y) ** 2                                                     
+        validation_loss += loss.view(-1).detach().data.numpy().tolist()
+
+    end = time.time()
+    torch.save(model.state_dict(), './checkpoints/disnet/disnet-3_layer-epoch_'+str(epoch)+'.model')                                                             
+    print('epoch loss: ' + str(sum(epoch_loss)/len(epoch_loss)) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str(print(end-start))) 
