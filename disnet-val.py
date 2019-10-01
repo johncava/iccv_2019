@@ -9,7 +9,7 @@ from sklearn.model_selection import KFold
 import glob
 import sys
 
-print(torch.cuda.is_available())
+#print(torch.cuda.is_available())
 
 Train = np.load('Train.npy')                                         
 Test = np.load('Val.npy')
@@ -57,6 +57,7 @@ for epoch in range(max_epochs):
         epoch_loss.append(loss.item())                                                  
         loss.backward()                                                         
         optimizer.step()                                                        
+        break
 
     # Validation
     validation_loss = []
@@ -72,7 +73,8 @@ for epoch in range(max_epochs):
         test_y = Variable(torch.Tensor(test_y).cuda(),requires_grad=False).view(len(data),1)
         loss = (pred - y) ** 2                                                     
         validation_loss += loss.view(-1).detach().data.numpy().tolist()
-
+        break
+        
     end = time.time()
     torch.save(model.state_dict(), './checkpoints/disnet/disnet-3_layer-epoch_'+str(epoch)+'.model')                                                             
     print('epoch loss: ' + str(sum(epoch_loss)/len(epoch_loss)) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start))) 

@@ -7,7 +7,7 @@ from torch.autograd import Variable
 from reader import *
 import sys
 
-print(torch.cuda.is_available())
+#print(torch.cuda.is_available())
 
 Train = np.load('Train.npy')                                         
 Test = np.load('Val.npy')
@@ -48,7 +48,7 @@ class Scinfaxi(nn.Module):
 model = Scinfaxi()
 learning_rate = 1e-3
 optimizer = optim.Adam([model.w1,model.w2,model.w3],lr=learning_rate)
-max_epochs = 10
+max_epochs = 1
 loss_fn = nn.MSELoss()
 
 import time
@@ -76,6 +76,7 @@ for epoch in range(max_epochs):
         epoch_loss.append(loss.item())
         loss.backward()
         optimizer.step()
+        break
 
     # Validation                                                                       
     validation_loss = []                                                                 
@@ -97,7 +98,8 @@ for epoch in range(max_epochs):
         test_y = Variable(torch.Tensor(test_y).cuda(),requires_grad=False).view(len(data),1)
         loss = (test_pred - test_y) ** 2
         validation_loss += loss.view(-1).detach().data.numpy().tolist()
-
+        break
+        
     end = time.time()
     torch.save(model.state_dict(), './checkpoints/gcn/gcn-3_layer-epoch_'+str(epoch)+'.model') 
     print('epoch loss: ' + str(sum(epoch_loss)/len(epoch_loss)) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start))) 
