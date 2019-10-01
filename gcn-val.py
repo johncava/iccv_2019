@@ -58,7 +58,7 @@ for epoch in range(max_epochs):
     for train in Train:
         x,l,y = [],[],[]
         dirs = glob.glob(train)
-        data = get_data_bbox_graph(dirs)
+        data = get_data_bbox_graph(dirs)[0]
         for i in data:
             x.append(i[0])
             l.append(i[1])
@@ -83,7 +83,7 @@ for epoch in range(max_epochs):
     for test in Test:                                                           
         test_x,test_l,test_y = [],[],[]
         dirs = glob.glob(train)
-        data = get_data_bbox_graph(dirs)                                                
+        data = get_data_bbox_graph(dirs)[0]
         for t in data:
             test_x.append(t[0])
             test_l.append(t[1])                                         
@@ -97,7 +97,7 @@ for epoch in range(max_epochs):
         test_pred = model.forward(A,D,l)    
         test_y = Variable(torch.Tensor(test_y).cuda(),requires_grad=False).view(len(data),1)
         loss = (test_pred - test_y) ** 2
-        validation_loss += loss.view(-1).detach().data.numpy().tolist()
+        validation_loss += loss.view(-1).cpu().detach().data.numpy().tolist()
         break
         
     end = time.time()

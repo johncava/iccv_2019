@@ -112,7 +112,7 @@ def get_data_dis(dirs):
 
 def get_depth_data(dirs):
     dataset = []
-    interpol = []                                                                
+    interpol = []
     for d in dirs:
         bbox = glob.glob(d + 'mask-item-*.bbox')
         for box in bbox:
@@ -130,7 +130,7 @@ def get_depth_data(dirs):
                     continue
                 distances = np.array([float(dis) for dis in content])
                 dataset.append([[float(bc) for bc in box_content] + labels[label],float(str(np.min(distances)))])
-            main_image = d + d.split('/')[-2] + '.jpg'
-            interpolation = np.load(d+ 'interpolation.npy')
-            interpol.append([main_image,interpolation])                                            
+        main_image = d + d.split('/')[-2] + '.jpg'
+        interpolation = np.load(d+ 'interpolation.npy')
+        interpol.append([main_image,interpolation])
     return dataset, interpol

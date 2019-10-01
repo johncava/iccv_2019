@@ -5,7 +5,6 @@ import torch.optim as optim
 import numpy as np
 from torch.autograd import Variable
 from reader import *
-from sklearn.model_selection import KFold
 import glob
 import sys
 
@@ -45,8 +44,8 @@ for epoch in range(max_epochs):
     for train in Train:                                                        
         x,y = [],[]
         dirs = glob.glob(train)
-        data = get_data_bbox(dirs)                                                            
-        for i in data:                                                          
+        data = get_data_bbox(dirs)[0]
+        for i in data:
             x.append(i[0])                                                      
             y.append(i[1])                                                      
         x = Variable(torch.Tensor(x).cuda(),requires_grad=False).view(len(data),7)     
@@ -64,7 +63,7 @@ for epoch in range(max_epochs):
     for test in Test:
         test_x,test_y = [],[]
         dirs = glob.glob(test)
-        data = get_data_bbox(dirs) 
+        data = get_data_bbox(dirs)[0] 
         for t in data:
             test_x.append(t[0])
             test_y.append(t[1])
@@ -72,7 +71,7 @@ for epoch in range(max_epochs):
         test_pred = model.forward(test_x)
         test_y = Variable(torch.Tensor(test_y).cuda(),requires_grad=False).view(len(data),1)
         loss = (pred - y) ** 2                                                     
-        validation_loss += loss.view(-1).detach().data.numpy().tolist()
+        validation_loss += loss.view(-1).cpu().detach().data.numpy().tolist()
         break
         
     end = time.time()
