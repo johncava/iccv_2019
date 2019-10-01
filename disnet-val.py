@@ -12,7 +12,7 @@ import sys
 print(torch.cuda.is_available())
 
 Train = np.load('Train.npy')                                         
-Test = np.load('Test.npy')
+Test = np.load('Val.npy')
 
 class Disnet(nn.Module):
     
@@ -75,4 +75,4 @@ for epoch in range(max_epochs):
 
     end = time.time()
     torch.save(model.state_dict(), './checkpoints/disnet/disnet-3_layer-epoch_'+str(epoch)+'.model')                                                             
-    print('epoch loss: ' + str(sum(epoch_loss)/len(epoch_loss)) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str(print(end-start))) 
+    print('epoch loss: ' + str(sum(epoch_loss)/len(epoch_loss)) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start))) 

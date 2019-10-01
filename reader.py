@@ -109,3 +109,28 @@ def get_data_dis(dirs):
                 distances = np.array([float(dis) for dis in content])
                 dataset.append([[float(bc) for bc in box_content] + labels[label],float(str(np.min(distances)))])                                               
     return dataset
+
+def get_depth_data(dirs):
+    dataset = []
+    interpol = []                                                                
+    for d in dirs:
+        bbox = glob.glob(d + 'mask-item-*.bbox')
+        for box in bbox:
+            dist_file = box.split('.bbox')[0] + '.dist'
+            box_contnent = None
+            with open(box, 'r') as b:
+                box_content = b.read().split('\n')[0].split(',')
+            with open(dist_file,'r') as f:
+                content = f.read().split('\n')
+                if len(content) <= 2:
+                    continue
+                label = content[-2]
+                content = content[:-2]
+                if label not in list(labels.keys()):
+                    continue
+                distances = np.array([float(dis) for dis in content])
+                dataset.append([[float(bc) for bc in box_content] + labels[label],float(str(np.min(distances)))])
+            main_image = d + d.split('/')[-2] + '.jpg'
+            interpolation = np.load(d+ 'interpolation.npy')
+            interpol.append([main_image,interpolation])                                            
+    return dataset, interpol

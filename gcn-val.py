@@ -10,7 +10,7 @@ import sys
 print(torch.cuda.is_available())
 
 Train = np.load('Train.npy')                                         
-Test = np.load('Test.npy')
+Test = np.load('Val.npy')
 
 def create_graph(points):
     graph = np.zeros((len(points),len(points)))
@@ -97,7 +97,7 @@ for epoch in range(max_epochs):
         test_y = Variable(torch.Tensor(test_y).cuda(),requires_grad=False).view(len(data),1)
         loss = (test_pred - test_y) ** 2
         validation_loss += loss.view(-1).detach().data.numpy().tolist()
-        
+
     end = time.time()
     torch.save(model.state_dict(), './checkpoints/gcn/gcn-3_layer-epoch_'+str(epoch)+'.model') 
-    print('epoch loss: ' + str(sum(epoch_loss)/len(epoch_loss)) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str(print(end-start))) 
+    print('epoch loss: ' + str(sum(epoch_loss)/len(epoch_loss)) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start))) 
