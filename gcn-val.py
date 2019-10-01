@@ -10,7 +10,7 @@ import sys
 #print(torch.cuda.is_available())
 
 Train = np.load('Train.npy')                                         
-Test = np.load('Val.npy')
+Val = np.load('Val.npy')
 
 def create_graph(points):
     graph = np.zeros((len(points),len(points)))
@@ -48,7 +48,7 @@ class Scinfaxi(nn.Module):
 model = Scinfaxi()
 learning_rate = 1e-3
 optimizer = optim.Adam([model.w1,model.w2,model.w3],lr=learning_rate)
-max_epochs = 1
+max_epochs = 10
 loss_fn = nn.MSELoss()
 
 import time
@@ -76,30 +76,28 @@ for epoch in range(max_epochs):
         epoch_loss.append(loss.item())
         loss.backward()
         optimizer.step()
-        break
 
     # Validation                                                                       
     validation_loss = []                                                                 
-    for test in Test:                                                           
-        test_x,test_l,test_y = [],[],[]
+    for val in Val:                                                           
+        val_x,val_l,val_y = [],[],[]
         dirs = glob.glob(train)
         data = get_data_bbox_graph(dirs)[0]
         for t in data:
-            test_x.append(t[0])
-            test_l.append(t[1])                                         
-            test_y.append(t[2])                                         
-        if (len(test_x) < 2) or (len(test_l) < 2) or (len(test_y) < 2):
+            val_x.append(t[0])
+            val_l.append(t[1])                                         
+            val_y.append(t[2])                                         
+        if (len(val_x) < 2) or (len(val_l) < 2) or (len(val_y) < 2):
             continue                                                            
-        A, D = create_graph(test_x)
+        A, D = create_graph(val_x)
         A = Variable(torch.Tensor(A),requires_grad=False).view(len(data),len(data)).cuda()
         D = Variable(torch.Tensor(D),requires_grad=False).view(len(data),len(data)).cuda()
-        l = Variable(torch.Tensor(test_l),requires_grad=False).view(len(data),3).cuda()
-        test_pred = model.forward(A,D,l)    
-        test_y = Variable(torch.Tensor(test_y).cuda(),requires_grad=False).view(len(data),1)
-        loss = (test_pred - test_y) ** 2
+        l = Variable(torch.Tensor(val_l),requires_grad=False).view(len(data),3).cuda()
+        val_pred = model.forward(A,D,l)    
+        val_y = Variable(torch.Tensor(val_y).cuda(),requires_grad=False).view(len(data),1)
+        loss = (val_pred - val_y) ** 2
         validation_loss += loss.view(-1).cpu().detach().data.numpy().tolist()
-        break
-        
+
     end = time.time()
     torch.save(model.state_dict(), './checkpoints/gcn/gcn-3_layer-epoch_'+str(epoch)+'.model') 
     print('epoch loss: ' + str(sum(epoch_loss)/len(epoch_loss)) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start))) 

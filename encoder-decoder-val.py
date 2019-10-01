@@ -9,7 +9,7 @@ from reader import get_depth_data
 from PIL import Image
 
 Train = np.load('Train.npy')                                         
-Test = np.load('Val.npy')
+Val = np.load('Val.npy')
 
 class EncoderDecoder(nn.Module):
 
@@ -32,21 +32,21 @@ class EncoderDecoder(nn.Module):
         x = F.relu(self.decnn2(x))
         x = F.relu(self.decnn3(x))
         return x
+
 model = EncoderDecoder().cuda()
 learning_rate = 1e-3
 loss_fn = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-max_epoch = 1
+max_epochs = 10
 
 import time
-for epoch in range(max_epoch):
+for epoch in range(max_epochs):
     epoch_loss = []
     start = time.time()
     for train in Train:
         dirs = glob.glob(train)
         gdata,data = get_depth_data(dirs)
         x,y = np.array(Image.open(data[0][0])),data[0][1]
-        print(x.shape,y.shape)
         x,y = x.reshape(1,3,480,640),y.reshape(1,1,480,640)
         x = Variable(torch.Tensor(x).cuda(), requires_grad=True)
         y = Variable(torch.Tensor(y).cuda(), requires_grad=False)
@@ -56,22 +56,20 @@ for epoch in range(max_epoch):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        break
 
     # Validation
     validation_loss = []
-    for test in Test:
-        test_x,test_y = [],[]
-        dirs = glob.glob(test)
+    for val in Val:
+        val_x,val_y = [],[]
+        dirs = glob.glob(val)
         g_data, data = get_depth_data(dirs)
-        test_x, test_y = np.array(Image.open(data[0][0])), data[0][1]
-        test_x, test_y = test_x.reshape(1,3,480,640), test_y.reshape(1,1,480,640)
-        test_x = Variable(torch.Tensor(test_x).cuda(),requires_grad=False)
-        test_pred = model.forward(test_x)
-        test_y = Variable(torch.Tensor(test_y).cuda(),requires_grad=False)
+        val_x, val_y = np.array(Image.open(data[0][0])), data[0][1]
+        val_x, val_y = val_x.reshape(1,3,480,640), val_y.reshape(1,1,480,640)
+        val_x = Variable(torch.Tensor(val_x).cuda(),requires_grad=False)
+        val_pred = model.forward(val_x)
+        val_y = Variable(torch.Tensor(val_y).cuda(),requires_grad=False)
         loss = (pred - y) ** 2
         validation_loss += loss.view(-1).cpu().detach().data.numpy().tolist()
-        break
         
     end = time.time()
     torch.save(model.state_dict(), './checkpoints/EncoderDecoder/EncoderDecoder-3_layer-epoch_'+str(epoch)+'.model') 

@@ -11,7 +11,7 @@ import sys
 #print(torch.cuda.is_available())
 
 Train = np.load('Train.npy')                                         
-Test = np.load('Val.npy')
+Val = np.load('Val.npy')
 
 class Disnet(nn.Module):
     
@@ -34,7 +34,7 @@ class Disnet(nn.Module):
 model = Disnet().cuda()                                                              
 learning_rate = 1e-3                                                            
 optimizer = optim.Adam(model.parameters(),lr=learning_rate)                     
-max_epochs = 1                                                                
+max_epochs = 10                                                             
 loss_fn = nn.MSELoss()                                                          
                                                                                 
 import time                                                                   
@@ -55,24 +55,22 @@ for epoch in range(max_epochs):
         loss = loss_fn(pred,y)
         epoch_loss.append(loss.item())                                                  
         loss.backward()                                                         
-        optimizer.step()                                                        
-        break
+        optimizer.step()
 
     # Validation
     validation_loss = []
-    for test in Test:
-        test_x,test_y = [],[]
-        dirs = glob.glob(test)
+    for val in Val:
+        val_x,val_y = [],[]
+        dirs = glob.glob(val)
         data = get_data_bbox(dirs)[0] 
         for t in data:
-            test_x.append(t[0])
-            test_y.append(t[1])
-        test_x = Variable(torch.Tensor(test_x).cuda(),requires_grad=False).view(len(data),7)
-        test_pred = model.forward(test_x)
-        test_y = Variable(torch.Tensor(test_y).cuda(),requires_grad=False).view(len(data),1)
+            val_x.append(t[0])
+            val_y.append(t[1])
+        val_x = Variable(torch.Tensor(val_x).cuda(),requires_grad=False).view(len(data),7)
+        val_pred = model.forward(val_x)
+        val_y = Variable(torch.Tensor(val_y).cuda(),requires_grad=False).view(len(data),1)
         loss = (pred - y) ** 2                                                     
         validation_loss += loss.view(-1).cpu().detach().data.numpy().tolist()
-        break
         
     end = time.time()
     torch.save(model.state_dict(), './checkpoints/disnet/disnet-3_layer-epoch_'+str(epoch)+'.model')                                                             
