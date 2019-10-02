@@ -8,7 +8,7 @@ def get_data_mask(dirs):
         masks = glob.glob(d + 'mask-item-*.jpg')
         for mask in masks:
             dist_file = mask.split('.jpg')[0] + '.dist'
-            with open(dist_file, 'r') as f:
+            with open(dist_file,encoding='utf8',errors='ignore') as f:
                 content = f.read().split('\n')
                 if len(content) <= 2:
                     continue
@@ -30,7 +30,7 @@ def get_data_mask_graph(dirs):
         for mask in masks:
             dist_file = mask.split('.jpg')[0] + '.dist'
             box_contnent = None
-            with open(dist_file,'r') as f:
+            with open(dist_file,encoding='utf8',errors='ignore') as f:
                 content = f.read().split('\n')
                 if len(content) <= 2:
                     continue
@@ -53,7 +53,7 @@ def get_data_bbox(dirs):
             box_contnent = None
             with open(box, 'r') as b:
                 box_content = b.read().split('\n')[0].split(',')
-            with open(dist_file,'r') as f:
+            with open(dist_file,encoding='utf8',errors='ignore') as f:
                 content = f.read().split('\n')
                 if len(content) <= 2:
                     continue
@@ -76,7 +76,7 @@ def get_data_bbox_graph(dirs):
             box_contnent = None
             with open(box, 'r') as b:
                 box_content = b.read().split('\n')[0].split(',')
-            with open(dist_file,'r') as f:
+            with open(dist_file,encoding='utf8',errors='ignore') as f:
                 content = f.read().split('\n')
                 if len(content) <= 2:
                     continue
@@ -98,7 +98,7 @@ def get_data_dis(dirs):
             box_contnent = None
             with open(box, 'r') as b:
                 box_content = b.read().split('\n')[0].split(',')
-            with open(dist_file,'r') as f:
+            with open(dist_file,encoding='utf8',errors='ignore') as f:
                 content = f.read().split('\n')
                 if len(content) <= 2:
                     continue
@@ -120,7 +120,7 @@ def get_depth_data(dirs):
             box_contnent = None
             with open(box, 'r') as b:
                 box_content = b.read().split('\n')[0].split(',')
-            with open(dist_file,'r') as f:
+            with open(dist_file,encoding='utf8',errors='ignore') as f:
                 content = f.read().split('\n')
                 if len(content) <= 2:
                     continue
