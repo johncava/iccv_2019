@@ -76,12 +76,12 @@ for epoch in range(max_epochs):
         epoch_loss.append(loss.item())
         loss.backward()
         optimizer.step()
-
+    
     # Validation                                                                       
     validation_loss = []                                                                 
     for val in Val:                                                           
         val_x,val_l,val_y = [],[],[]
-        dirs = glob.glob(train)
+        dirs = glob.glob(val)
         data = get_data_bbox_graph(dirs)[0]
         for t in data:
             val_x.append(t[0])
@@ -95,9 +95,9 @@ for epoch in range(max_epochs):
         l = Variable(torch.Tensor(val_l),requires_grad=False).view(len(data),3).cuda()
         val_pred = model.forward(A,D,l)    
         val_y = Variable(torch.Tensor(val_y).cuda(),requires_grad=False).view(len(data),1)
-        loss = (val_pred - val_y) ** 2
-        validation_loss += loss.view(-1).cpu().detach().data.numpy().tolist()
+        loss = loss_fn(val_pred,val_y)
+        validation_loss.append(loss.item())
 
     end = time.time()
     torch.save(model.state_dict(), './checkpoints/gcn/gcn-3_layer-epoch_'+str(epoch)+'.model') 
-    print('epoch loss: ' + str(sum(epoch_loss)/len(epoch_loss)) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start))) 
+    print('epoch loss: ' + str(np.array(epoch_loss).mean()) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start))) 

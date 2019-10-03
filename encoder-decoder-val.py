@@ -68,9 +68,9 @@ for epoch in range(max_epochs):
         val_x = Variable(torch.Tensor(val_x).cuda(),requires_grad=False)
         val_pred = model.forward(val_x)
         val_y = Variable(torch.Tensor(val_y).cuda(),requires_grad=False)
-        loss = (pred - y) ** 2
-        validation_loss += loss.view(-1).cpu().detach().data.numpy().tolist()
+        loss = loss_fn(val_pred - val_y)
+        validation_loss.append(loss.item())
         
     end = time.time()
     torch.save(model.state_dict(), './checkpoints/EncoderDecoder/EncoderDecoder-3_layer-epoch_'+str(epoch)+'.model') 
-    print('epoch loss: ' + str(sum(epoch_loss)/len(epoch_loss)) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start)))
+    print('epoch loss: ' + str(np.array(epoch_loss).mean()) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start)))
