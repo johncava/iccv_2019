@@ -95,8 +95,8 @@ for epoch in range(max_epochs):
         l = Variable(torch.Tensor(val_l),requires_grad=False).view(len(data),3).cuda()
         val_pred = model.forward(A,D,l)    
         val_y = Variable(torch.Tensor(val_y).cuda(),requires_grad=False).view(len(data),1)
-        loss = loss_fn(val_pred,val_y)
-        validation_loss.append(loss.item())
+        val_loss = loss_fn(val_pred,val_y)
+        validation_loss.append(val_loss.item())
 
     end = time.time()
     torch.save(model.state_dict(), './checkpoints/gcn/gcn-3_layer-epoch_'+str(epoch)+'.model') 
