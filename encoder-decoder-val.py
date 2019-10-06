@@ -37,16 +37,21 @@ model = EncoderDecoder().cuda()
 learning_rate = 1e-3
 loss_fn = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-max_epochs = 10
+max_epochs = 1
 
 import time
 for epoch in range(max_epochs):
     epoch_loss = []
     start = time.time()
+    train_error = []
+    val_error = []
     for train in Train:
         dirs = glob.glob(train)
         gdata,data = get_depth_data(dirs)
         x,y = np.array(Image.open(data[0][0])),data[0][1]
+        if len(x.shape) < 2:
+            train_error.append(train)
+            continue
         x,y = x.reshape(1,3,480,640),y.reshape(1,1,480,640)
         x = Variable(torch.Tensor(x).cuda(), requires_grad=True)
         y = Variable(torch.Tensor(y).cuda(), requires_grad=False)
@@ -64,6 +69,9 @@ for epoch in range(max_epochs):
         dirs = glob.glob(val)
         g_data, data = get_depth_data(dirs)
         val_x, val_y = np.array(Image.open(data[0][0])), data[0][1]
+        if len(val_x.shape) < 2:
+            val_error.append(val)
+            continue
         val_x, val_y = val_x.reshape(1,3,480,640), val_y.reshape(1,1,480,640)
         val_x = Variable(torch.Tensor(val_x).cuda(),requires_grad=False)
         val_pred = model.forward(val_x)
@@ -72,5 +80,7 @@ for epoch in range(max_epochs):
         validation_loss.append(val_loss.item())
         
     end = time.time()
-    torch.save(model.state_dict(), './checkpoints/EncoderDecoder/EncoderDecoder-3_layer-epoch_'+str(epoch)+'.model') 
-    print('epoch loss: ' + str(np.array(epoch_loss).mean()) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start)))
+    np.save('train_error.npy', train_error)
+    np.save('val_error.npy', val_error)
+    #torch.save(model.state_dict(), './checkpoints/EncoderDecoder/EncoderDecoder-3_layer-epoch_'+str(epoch)+'.model') 
+    #print('epoch loss: ' + str(np.array(epoch_loss).mean()) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start)))
