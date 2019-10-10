@@ -16,20 +16,35 @@ class EncoderDecoder(nn.Module):
     def __init__(self):
         super(EncoderDecoder, self).__init__()
         self.cnn1 = nn.Conv2d(3,10,kernel_size=(8,8))
+        self.pool1 = nn.MaxPool2d(4,return_indices=True)
         self.cnn2 = nn.Conv2d(10,25,kernel_size=(8,8))
+        self.pool2 = nn.MaxPool2d(4,return_indices=True)
         self.cnn3 = nn.Conv2d(25,50,kernel_size=(5,5))
+        self.pool3 = nn.MaxPool2d(4,return_indices=True)
 
+        self.unpool1 = nn.MaxUnpool2d(4)
         self.decnn1 = nn.ConvTranspose2d(50,25,kernel_size=(5,5))
+        self.unpool2 = nn.MaxUnpool2d(4)
         self.decnn2 = nn.ConvTranspose2d(25,10,kernel_size=(8,8))
+        self.unpool3 = nn.MaxUnpool2d(4)
         self.decnn3 = nn.ConvTranspose2d(10,1,kernel_size=(8,8))
 
     def forward(self,x):
         x = F.relu(self.cnn1(x))
+        s1 = x.size()
+        x, i1 = self.pool1(x)
         x = F.relu(self.cnn2(x))
+        s2 = x.size()
+        x, i2 = self.pool2(x)
         x = F.relu(self.cnn3(x))
+        s3 = x.size()
+        x, i3 = self.pool3(x)
 
+        x = self.unpool1(x,i3,s3)
         x = F.relu(self.decnn1(x))
+        x = self.unpool2(x,i2,s2)
         x = F.relu(self.decnn2(x))
+        x = self.unpool3(x,i1,s1)
         x = F.relu(self.decnn3(x))
         return x
 
