@@ -8,8 +8,8 @@ from torch.autograd import Variable
 from reader import get_depth_data
 from PIL import Image
 
-Train = np.load('Train.npy')                                         
-Val = np.load('Val.npy')
+Train = np.load('final_dataset_train.npy')
+Val = np.load('final_dataset_val.npy')
 
 class EncoderDecoder(nn.Module):
 
@@ -52,7 +52,7 @@ model = EncoderDecoder().cuda()
 learning_rate = 1e-3
 loss_fn = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-max_epochs = 1
+max_epochs = 10
 
 import time
 for epoch in range(max_epochs):
@@ -95,7 +95,5 @@ for epoch in range(max_epochs):
         validation_loss.append(val_loss.item())
         
     end = time.time()
-    np.save('train_error.npy', train_error)
-    np.save('val_error.npy', val_error)
-    #torch.save(model.state_dict(), './checkpoints/EncoderDecoder/EncoderDecoder-3_layer-epoch_'+str(epoch)+'.model') 
-    #print('epoch loss: ' + str(np.array(epoch_loss).mean()) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start)))
+    torch.save(model.state_dict(), './checkpoints/EncoderDecoder/EncoderDecoder-3_layer-epoch_'+str(epoch)+'.model') 
+    print('epoch loss: ' + str(np.array(epoch_loss).mean()) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start)))
