@@ -10,15 +10,15 @@ import sys
 
 #print(torch.cuda.is_available())
 
-Train = np.load('Train.npy')                                         
-Val = np.load('Val.npy')
+Train = np.load('final_dataset_train.npy')
+Val = np.load('final_dataset_val.npy')
 
 class Disnet(nn.Module):
     
     def __init__(self):
         super(Disnet,self).__init__()
         self.disnet = nn.Sequential(
-            nn.Linear(7,100),
+            nn.Linear(12,100),
             nn.ReLU(),
             nn.Linear(100,100),
             nn.ReLU(),
@@ -48,7 +48,7 @@ for epoch in range(max_epochs):
         for i in data:
             x.append(i[0])                                                      
             y.append(i[1])                                                      
-        x = Variable(torch.Tensor(x).cuda(),requires_grad=False).view(len(data),7)     
+        x = Variable(torch.Tensor(x).cuda(),requires_grad=False).view(len(data),12)     
         pred = model(x)                                                         
         y = Variable(torch.Tensor(y).cuda(),requires_grad=False).view(len(data),1)     
         optimizer.zero_grad()                                                   
@@ -66,7 +66,7 @@ for epoch in range(max_epochs):
         for t in data:
             val_x.append(t[0])
             val_y.append(t[1])
-        val_x = Variable(torch.Tensor(val_x).cuda(),requires_grad=False).view(len(data),7)
+        val_x = Variable(torch.Tensor(val_x).cuda(),requires_grad=False).view(len(data),12)
         val_pred = model.forward(val_x)
         val_y = Variable(torch.Tensor(val_y).cuda(),requires_grad=False).view(len(data),1)
         val_loss = loss_fn(val_pred,val_y)                                                     

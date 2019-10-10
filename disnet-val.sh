@@ -6,8 +6,8 @@
 #SBATCH --gres=gpu:1                # Request two GPUs
 
 #SBATCH -t 0-24:00                  # wall time (D-HH:MM)
-#SBATCH -o disnet-val.out             # STDOUT (%j = JobId)
-#SBATCH -e disnet-val.err             # STDERR (%j = JobId)
+#SBATCH -o disnet-val-6.out             # STDOUT (%j = JobId)
+#SBATCH -e disnet-val-6.err             # STDERR (%j = JobId)
 #SBATCH --mail-type=ALL             # Send a notification when a job starts, stops, or fails
 #SBATCH --mail-user=jcava@asu.edu # send-to address
 

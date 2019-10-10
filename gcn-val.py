@@ -9,8 +9,8 @@ import sys
 
 #print(torch.cuda.is_available())
 
-Train = np.load('Train.npy')                                         
-Val = np.load('Val.npy')
+Train = np.load('final_dataset_train.npy')
+Val = np.load('final_dataset_val.npy')
 
 def create_graph(points):
     graph = np.zeros((len(points),len(points)))
@@ -35,7 +35,7 @@ class Scinfaxi(nn.Module):
 
     def __init__(self):
         super(Scinfaxi,self).__init__()
-        self.w1 = Variable(torch.randn(3,3).cuda(),requires_grad=True)
+        self.w1 = Variable(torch.randn(8,3).cuda(),requires_grad=True)
         self.w2 = Variable(torch.randn(3,2).cuda(),requires_grad=True)
         self.w3 = Variable(torch.randn(2,1).cuda(),requires_grad=True)
 
@@ -68,7 +68,7 @@ for epoch in range(max_epochs):
         A, D = create_graph(x)
         A = Variable(torch.Tensor(A),requires_grad=False).view(len(data),len(data)).cuda()
         D = Variable(torch.Tensor(D),requires_grad=False).view(len(data),len(data)).cuda()
-        l = Variable(torch.Tensor(l),requires_grad=False).view(len(data),3).cuda()
+        l = Variable(torch.Tensor(l),requires_grad=False).view(len(data),8).cuda()
         pred = model(A,D,l)
         y = Variable(torch.Tensor(y).cuda(),requires_grad=False).view(len(data),1)
         optimizer.zero_grad()
@@ -92,7 +92,7 @@ for epoch in range(max_epochs):
         A, D = create_graph(val_x)
         A = Variable(torch.Tensor(A),requires_grad=False).view(len(data),len(data)).cuda()
         D = Variable(torch.Tensor(D),requires_grad=False).view(len(data),len(data)).cuda()
-        l = Variable(torch.Tensor(val_l),requires_grad=False).view(len(data),3).cuda()
+        l = Variable(torch.Tensor(val_l),requires_grad=False).view(len(data),8).cuda()
         val_pred = model.forward(A,D,l)    
         val_y = Variable(torch.Tensor(val_y).cuda(),requires_grad=False).view(len(data),1)
         val_loss = loss_fn(val_pred,val_y)

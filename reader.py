@@ -20,7 +20,7 @@ def get_data_mask(dirs):
         dataset.append(batch)
     return dataset
 
-labels = {'car': [1,0,0], 'person':[0,1,0], 'bicycle':[0,0,1]}
+labels = {'car': [1,0,0,0,0,0,0,0], 'person':[0,1,0,0,0,0,0,0], 'bicycle':[0,0,1,0,0,0,0,0],'traffic light': [0,0,0,1,0,0,0,0], 'bus': [0,0,0,0,1,0,0,0], 'motorcycle':[0,0,0,0,0,1,0,0],'truck':[0,0,0,0,0,0,1,0], 'skateboard': [0,0,0,0,0,0,0,1]}
 
 def get_data_mask_graph(dirs):
     dataset = []
