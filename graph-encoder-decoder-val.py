@@ -22,7 +22,7 @@ class GraphEncoderDecoder(nn.Module):
         self.cnn3 = nn.Conv2d(25,50,kernel_size=(5,5))
         self.pool3 = nn.MaxPool2d(4,return_indices=True)
 
-        self.unpool1 = nn.MaxUnool2d(4)
+        self.unpool1 = nn.MaxUnpool2d(4)
         self.decnn1 = nn.ConvTranspose2d(50,25,kernel_size=(5,5))
         self.unpool2 = nn.MaxUnpool2d(4)
         self.decnn2 = nn.ConvTranspose2d(25,10,kernel_size=(8,8))
@@ -35,7 +35,7 @@ class GraphEncoderDecoder(nn.Module):
         self.hidden = nn.Linear(2100,2000)
 
     def forward(self,x,g):
-        g = [torch.Tensor([gi]) for gi in g]
+        g = [torch.Tensor([gi]).cuda() for gi in g]
         x = F.relu(self.cnn1(x))
         s1 = x.size()
         x, i1 = self.pool1(x)
@@ -103,6 +103,7 @@ for epoch in range(max_epochs):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        break
 
     # Validation
     validation_loss = []
@@ -121,7 +122,7 @@ for epoch in range(max_epochs):
         val_y = Variable(torch.Tensor(val_y).cuda(),requires_grad=False)
         val_loss = loss_fn(val_pred,val_y)
         validation_loss.append(val_loss.item())
-    
+        break 
         
     end = time.time()
     torch.save(model.state_dict(), './checkpoints/GraphEncoderDecoder/GraphEncoderDecoder-3_layer-epoch_'+str(epoch)+'.model') 
