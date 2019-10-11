@@ -78,7 +78,7 @@ model = GraphEncoderDecoder().cuda()
 learning_rate = 1e-3
 loss_fn = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-max_epochs = 1
+max_epochs = 10
 
 import time
 for epoch in range(max_epochs):
@@ -103,7 +103,6 @@ for epoch in range(max_epochs):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        break
 
     # Validation
     validation_loss = []
@@ -122,7 +121,6 @@ for epoch in range(max_epochs):
         val_y = Variable(torch.Tensor(val_y).cuda(),requires_grad=False)
         val_loss = loss_fn(val_pred,val_y)
         validation_loss.append(val_loss.item())
-        break 
         
     end = time.time()
     torch.save(model.state_dict(), './checkpoints/GraphEncoderDecoder/GraphEncoderDecoder-3_layer-epoch_'+str(epoch)+'.model') 
