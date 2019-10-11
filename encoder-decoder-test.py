@@ -51,8 +51,8 @@ class EncoderDecoder(nn.Module):
 
 # Test
 candidate_models = glob.glob('./checkpoints/EncoderDecoder/*.model')
-test_model = EncoderDecoder()
-test_model.load_state_dict(torch.load(candidate_models[-1])['state_dict'])
+test_model = EncoderDecoder().cuda()
+test_model.load_state_dict(torch.load(candidate_models[-1]))
 
 test_loss = []
 for test in Test:
@@ -62,14 +62,15 @@ for test in Test:
     test_x, test_y = np.array(Image.open(data[0][0])), data[0][1]
     test_x, test_y = test_x.reshape(1,3,480,640), test_y.reshape(1,1,480,640)
     test_x = Variable(torch.Tensor(test_x).cuda(),requires_grad=False)
-    test_pred = model.forward(test_x).detach().numpy()
+    test_pred = test_model.forward(test_x).detach().cpu().numpy()
+    test_pred = test_pred.reshape(480,640)
     for box in g_data:
         info,dis = box
         info = [int(i) for i in info[:4]]
         # str(startX),str(startY),str(endX),str(endY)
         startX ,startY, endX, endY = info[0], info[1], info[2], info[3]
-        pred_dis = test_pred[startY:endY,startX:endX].min()/1000.0
-        dis_error = pred_dis - dis
+        pred_dis = test_pred[startY:endY,startX:endX]#.min()/1000.0
+        pred_dis = pred_dis[pred_dis > 0]
+        dis_error = abs(pred_dis.min() - dis)
         test_loss.append(dis_error)
-    break
 print('Test Loss:',np.mean(test_loss))
