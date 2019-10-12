@@ -8,6 +8,8 @@ from reader import *
 import glob
 import sys
 
+path = './checkpoints/disnet/L3/'
+
 Train = np.load('final_dataset_train.npy')
 Val = np.load('final_dataset_val.npy')
 Test = np.load('final_dataset_test.npy')
@@ -33,7 +35,7 @@ class Disnet(nn.Module):
 model = Disnet().cuda()                                                              
 learning_rate = 1e-3                                                            
 optimizer = optim.Adam(model.parameters(),lr=learning_rate)                     
-max_epochs = 10                                                             
+max_epochs = 15                                                             
 loss_fn = nn.MSELoss()                                                          
                                                                                 
 import time
@@ -76,7 +78,7 @@ for epoch in range(max_epochs):
         validation_losses.append(val_loss.item())
 
     end = time.time()
-    torch.save(model.state_dict(), './checkpoints/disnet/disnet-3_layer-epoch_'+str(epoch)+'.model')
+    model_path = path + 'disnet-3_layer-epoch_'+str(epoch)+'.model'
     torch.save(model.state_dict(), model_path) 
     candidate_models.append(model_path)                                                             
     print('epoch loss: ' + str(np.array(epoch_loss).mean()) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start))) 
@@ -103,4 +105,5 @@ for test in Test:
     test_pred = test_model.forward(test_x).detach().cpu().numpy().tolist()
     for i,j in zip(test_pred,test_y):
         test_loss.append(abs(i-j))
+np.save(path+'test_loss.npy',test_loss)
 print('Test Loss:',np.mean(test_loss))

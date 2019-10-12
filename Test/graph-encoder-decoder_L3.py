@@ -8,6 +8,8 @@ from torch.autograd import Variable
 from reader import get_depth_data
 from PIL import Image
 
+path = './checkpoints/GraphEncoderDecoder/L3/'
+
 Train = np.load('final_dataset_train.npy')
 Val = np.load('final_dataset_val.npy')
 Test = np.load('final_dataset_test.npy')
@@ -79,7 +81,7 @@ model = GraphEncoderDecoder().cuda()
 learning_rate = 1e-3
 loss_fn = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-max_epochs = 10
+max_epochs = 15
 
 import time
 candidate_models = []
@@ -120,7 +122,7 @@ for epoch in range(max_epochs):
         validation_losses.append(val_loss.item())
 
     end = time.time()
-    model_path = path + fold + 'GraphEncoderDecoder-3_layer-epoch_'+str(epoch)+'.model'
+    model_path = path + 'GraphEncoderDecoder-3_layer-epoch_'+str(epoch)+'.model'
     torch.save(model.state_dict(), model_path) 
     candidate_models.append(model_path) 
     print('epoch loss: ' + str(np.array(epoch_loss).mean()) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start)))
@@ -155,4 +157,5 @@ for test in Test:
         pred_dis = pred_dis[pred_dis > 0]
         dis_error = abs(pred_dis.mean() - dis)
         test_loss.append(dis_error)
+np.save(path+'test_loss.npy',test_loss)
 print('Test Loss:',np.mean(test_loss))

@@ -7,6 +7,8 @@ from torch.autograd import Variable
 from reader import *
 import sys
 
+path = './checkpoints/gcn/L3/'
+
 Train = np.load('final_dataset_train.npy')
 Val = np.load('final_dataset_val.npy')
 Test = np.load('final_dataset_test.npy')
@@ -47,7 +49,7 @@ class Scinfaxi(nn.Module):
 model = Scinfaxi()
 learning_rate = 1e-3
 optimizer = optim.Adam([model.w1,model.w2,model.w3],lr=learning_rate)
-max_epochs = 10
+max_epochs = 15
 loss_fn = nn.MSELoss()
 
 import time
@@ -98,7 +100,7 @@ for epoch in range(max_epochs):
         validation_losses.append(val_loss.item())
 
     end = time.time()
-    torch.save(model.state_dict(), './checkpoints/gcn/gcn-3_layer-epoch_'+str(epoch)+'.model')
+    model_path = path + 'gcn-3_layer-epoch_'+str(epoch)+'.model'
     torch.save(model.state_dict(), model_path) 
     candidate_models.append(model_path) 
     print('epoch loss: ' + str(np.array(epoch_loss).mean()) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start))) 
@@ -129,4 +131,5 @@ for test in Test:
     test_pred = test_model.forward(A,D,l).detach().cpu().numpy().tolist()
     for i,j in zip(test_pred,test_y):
         test_loss.append(abs(i-j))
+np.save(path+'test_loss.npy',test_loss)
 print('Test Loss:',np.mean(test_loss))
