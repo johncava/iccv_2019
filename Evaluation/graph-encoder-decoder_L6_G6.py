@@ -8,7 +8,7 @@ from torch.autograd import Variable
 from reader import get_depth_data
 from PIL import Image
 
-path = './checkpoints/GraphEncoderDecoder/L6_G3/'
+path = './checkpoints/GraphEncoderDecoder/L6_G6/'
 
 Train = np.load('iccv_dataset_train.npy')
 Val = np.load('iccv_dataset_val.npy')
@@ -52,6 +52,15 @@ class GraphEncoderDecoder(nn.Module):
 
         self.a3 = nn.Linear(2*12,1)
         self.W3 = nn.Linear(12,12)
+
+        self.a4 = nn.Linear(2*12,1)
+        self.W4 = nn.Linear(12,12)
+
+        self.a5 = nn.Linear(2*12,1)
+        self.W5 = nn.Linear(12,12)
+
+        self.a6 = nn.Linear(2*12,1)
+        self.W6 = nn.Linear(12,12)
 
         self.P = nn.Linear(12,100)
         self.hidden = nn.Linear(1500,1400)
@@ -122,7 +131,52 @@ class GraphEncoderDecoder(nn.Module):
             h3.append(sum(s))
         h3 = torch.cat(h3,dim=0)
 
-        latent = self.P(h3)
+        h3 = list(h3.unsqueeze(dim=1))
+        h4 = []
+        for i,hi in enumerate(h3):
+            a_weights = []
+            h_neighbors = []
+            for j, hj in enumerate(h3):
+                a = F.relu(self.a4(torch.cat((self.W4(hi),self.W4(hj)),dim=1)))
+                a_weights.append(a)
+                h_neighbors.append(hj)
+            s = []
+            for aw, hn in zip(a_weights,h_neighbors):
+                s.append(self.W4(aw*hn))
+            h4.append(sum(s))
+        h4 = torch.cat(h4,dim=0)
+
+        h4 = list(h4.unsqueeze(dim=1))
+        h5 = []
+        for i,hi in enumerate(h4):
+            a_weights = []
+            h_neighbors = []
+            for j, hj in enumerate(h4):
+                a = F.relu(self.a5(torch.cat((self.W5(hi),self.W5(hj)),dim=1)))
+                a_weights.append(a)
+                h_neighbors.append(hj)
+            s = []
+            for aw, hn in zip(a_weights,h_neighbors):
+                s.append(self.W5(aw*hn))
+            h5.append(sum(s))
+        h5 = torch.cat(h5,dim=0)
+
+        h5 = list(h5.unsqueeze(dim=1))
+        h6 = []
+        for i,hi in enumerate(h5):
+            a_weights = []
+            h_neighbors = []
+            for j, hj in enumerate(h5):
+                a = F.relu(self.a6(torch.cat((self.W6(hi),self.W6(hj)),dim=1)))
+                a_weights.append(a)
+                h_neighbors.append(hj)
+            s = []
+            for aw, hn in zip(a_weights,h_neighbors):
+                s.append(self.W6(aw*hn))
+            h6.append(sum(s))
+        h6 = torch.cat(h6,dim=0)
+
+        latent = self.P(h6)
         latent = torch.mean(latent,dim=0)
         x = torch.cat((x.flatten(),latent),dim=0)
         x = self.hidden(x)
@@ -188,7 +242,7 @@ for epoch in range(max_epochs):
     validation_losses.append(np.array(validation_loss).mean())
 
     end = time.time()
-    model_path = path + 'GraphEncoderDecoder-G3-6_layer-epoch_'+str(epoch)+'.model'
+    model_path = path + 'GraphEncoderDecoder-G6-6_layer-epoch_'+str(epoch)+'.model'
     torch.save(model.state_dict(), model_path) 
     candidate_models.append(model_path) 
     print('epoch loss: ' + str(np.array(epoch_loss).mean()) + ', Val loss: ' + str(np.array(validation_loss).mean()) + ', Time: ' + str((end-start)))
