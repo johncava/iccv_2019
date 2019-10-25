@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "disnet-val.py", line 51, in <module>
+    x = Variable(torch.Tensor(x).cuda(),requires_grad=False).view(len(data),7)     
+RuntimeError: shape '[4, 7]' is invalid for input of size 48
